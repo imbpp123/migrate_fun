@@ -15,10 +15,10 @@ class DbFactory
 
         switch($alias) {
             case 'src':
-                $connection = new PDO("pgsql:host=postgres-src;port=5432;dbname=src_db");
+                $connection = new PDO("pgsql:host=postgres-src;port=5432;dbname=src_db", 'user', 'password');
                 break;
             case 'dst':
-                $connection = new PDO("mysql:dbname=dst_db;host=mysql-dst", 'root', 'password');
+                $connection = new PDO("mysql:dbname=dst_db;host=mysql-dest", 'root', 'password');
                 break;
             case 'data':
                 $connection = new PDO("mysql:dbname=db_data;host=mysql-data", 'root', 'password');
@@ -54,5 +54,6 @@ class DbFactory
         } else {
             print_r($connection->errorInfo());
         }
+        echo PHP_EOL;
     }
 }

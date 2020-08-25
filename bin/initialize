@@ -7,8 +7,22 @@ set_time_limit(0);
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
+function randomString(): string
+{
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $randstring = '';
+    for ($i = 0; $i < 10; $i++) {
+        $randstring .= $characters[rand(0, strlen($characters))];
+    }
+    return $randstring;
+}
+
+
 $dbFactory = new DbFactory();
 
+/**
+ * Create chunk info table
+ */
 $sql = <<<'SQL'
 create table chunk_info
 (
@@ -23,3 +37,59 @@ SQL;
 $dbFactory->getConnectionData()->exec('DROP TABLE IF EXISTS chunk_info');
 
 $dbFactory->createTable('data', $sql);
+
+/**
+ * Create src table
+ */
+$sql = <<<'SQL'
+create table src_table
+(
+    id serial not null
+        constraint src_table_pk
+            primary key,
+    col1_char varchar,
+    col2_int  integer,
+    col3_int  integer,
+    col4_char varchar
+);
+SQL;
+
+$dbFactory->getConnection('src')->exec('DROP TABLE IF EXISTS src_table');
+
+$dbFactory->createTable('src', $sql);
+
+/**
+ * Create dst table
+ */
+$sql = <<<'SQL'
+create table dst_table
+(
+    id      int auto_increment primary key,
+    col1_char   varchar(255),
+    col2_int    int,
+    col3_int    int,
+    col4_char   varchar(255)  
+);
+SQL;
+
+$dbFactory->getConnection('dst')->exec('DROP TABLE IF EXISTS dst_table');
+
+$dbFactory->createTable('dst', $sql);
+
+/**
+ * Generate SRC data... many data!!!
+ */
+echo "Generate SRC data (press CTRL+C to interrupt if you think it is enough)... ";
+for ($i = 0; $i < 1000000; $i++) {
+    $col1 = randomString();
+    $col2 = random_int(10, 9999999);
+    $col3 = random_int(10, 9999999);
+    $col4 = randomString();
+
+    $dbFactory->getConnection('src')->exec("INSERT INTO src_table (col1_char, col2_int, col3_int, col4_char) VALUES ('{$col1}', {$col2}, {$col3}, '{$col4}')");
+
+    if ($i % 10000 === 0) {
+        echo $i . "... ";
+    }
+}
+echo "done" . PHP_EOL;
