@@ -1,0 +1,10 @@
+{
+    "name": "onefit/migrate_fun",
+    "description": "This is tool to migrate chunks of data using hash... yep, like torrent",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

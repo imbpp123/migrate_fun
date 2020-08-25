@@ -1,0 +1,51 @@
+version: '3'
+services:
+
+    mysql-data:
+        container_name: migrate_mysql_data
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_DATABASE: 'db_data'
+            MYSQL_USER: 'user'
+            MYSQL_PASSWORD: 'password'
+            MYSQL_ROOT_PASSWORD: 'password'
+        ports:
+            - "33307:3306"
+
+    mysql-dest:
+        container_name: migrate_mysql_dst
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_DATABASE: 'dst_db'
+            MYSQL_USER: 'user'
+            MYSQL_PASSWORD: 'password'
+            MYSQL_ROOT_PASSWORD: 'password'
+        ports:
+            - "33306:3306"
+
+    postgres-src:
+        container_name: migrate_psql_src
+        image: postgres:12
+        environment:
+            - POSTGRES_USER=user
+            - POSTGRES_PASSWORD=password
+            - POSTGRES_DB=src_db
+        ports:
+            - "35432:5432"
+
+    php-fpm:
+        container_name: migrate_php
+        build:
+            dockerfile: ./docker/php-fpm/Dockerfile
+            context: .
+        environment:
+            XDEBUG_CONFIG: "remote_host=host.docker.internal remote_enable=1"
+            PHP_IDE_CONFIG: "serverName=migrate-data"
+        depends_on:
+            - postgres-src
+            - mysql-data
+            - mysql-dest
+        volumes:
+            - ./:/var/www/html

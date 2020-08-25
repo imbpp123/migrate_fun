@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+
+use App\Factory\DbFactory;
+
+set_time_limit(0);
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+$dbFactory = new DbFactory();
+
+$sql = <<<'SQL'
+create table chunk_info
+(
+    id       int auto_increment primary key,
+    etl      varchar(255) not null,
+    start_id int          not null,
+    stop_id  int          not null,
+    size     int          null
+);
+SQL;
+
+$dbFactory->getConnectionData()->exec('DROP TABLE IF EXISTS chunk_info');
+
+$dbFactory->createTable('data', $sql);

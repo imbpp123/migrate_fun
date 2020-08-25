@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+use App\ChunkChecker;
+use App\ChunkMaintain;
+use App\Factory\DbFactory;
+use App\Service\ChunkService;
+
+set_time_limit(0);
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+// get ETL from factory here... i just skip it
+$etl = new \App\ETL\ExampleETL();
+
+$maintain = new ChunkMaintain(new ChunkService());
+$maintain->run($etl);
