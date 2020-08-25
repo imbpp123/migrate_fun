@@ -3,9 +3,22 @@
 namespace App\ETL;
 
 use App\Entity\ChunkEntity;
+use App\Factory\DbFactory;
+use App\Service\ChunkService;
 
 class ExampleETL implements ETLInterface
 {
+    private ChunkService $chunkService;
+    private DbFactory $dbFactory;
+
+    public function __construct(
+        ChunkService $chunkService,
+        DbFactory $dbFactory
+    ) {
+        $this->chunkService = $chunkService;
+        $this->dbFactory = $dbFactory;
+    }
+
     public function getChunkSize(): int
     {
         return 10000;
@@ -13,7 +26,9 @@ class ExampleETL implements ETLInterface
 
     public function getMaxId(): int
     {
-        return 'select max(id) from table1';
+        // define sql to SOURCE with max(id) here!!!
+        $sql = 'SELECT max(id) FROM src_table';
+        return $this->dbFactory->getSingleNumber('src', $sql);
     }
 
     public function getChunkToUpdate(): ChunkEntity

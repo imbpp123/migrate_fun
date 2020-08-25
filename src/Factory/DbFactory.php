@@ -4,10 +4,11 @@ namespace App\Factory;
 
 use LogicException;
 use PDO;
+use PDOStatement;
 
 class DbFactory
 {
-    private array $connections = [];
+    private static array $connections = [];
 
     private function createConnection(string $alias): PDO
     {
@@ -32,10 +33,10 @@ class DbFactory
 
     public function getConnection(string $alias): PDO
     {
-        if (!array_key_exists($alias, $this->connections)) {
-            $this->connections[$alias] = $this->createConnection($alias);
+        if (!array_key_exists($alias, self::$connections)) {
+            self::$connections[$alias] = $this->createConnection($alias);
         }
-        return $this->connections[$alias];
+        return self::$connections[$alias];
     }
 
     public function getConnectionData(): PDO
@@ -48,12 +49,37 @@ class DbFactory
         $connection = $this->getConnection($alias);
 
         echo $sql . PHP_EOL;
-        $chunkInfoCreated = $connection->exec($sql);
-        if ($chunkInfoCreated !== false) {
-            echo "Table created!" . PHP_EOL;
+        $execChunk = $connection->exec($sql);
+        if ($execChunk !== false) {
+            echo "SQL created!" . PHP_EOL;
         } else {
             print_r($connection->errorInfo());
         }
         echo PHP_EOL;
+    }
+
+    public function exec(string $alias, string $sql): void
+    {
+        $connection = $this->getConnection($alias);
+
+        $execChunk = $connection->exec($sql);
+        if ($execChunk === false) {
+            print_r($connection->errorInfo());
+        }
+    }
+
+    public function getSingleNumber(string $alias, string $sql)
+    {
+        $connection = $this->getConnection($alias);
+
+        $stmt = $connection->query($sql);
+        $number = $stmt->fetch(PDO::FETCH_NUM);
+        return $number[0];
+    }
+
+    public function querySql(string $alias, string $sql): PDOStatement
+    {
+        echo "SQL: " . $sql . PHP_EOL;
+        return $this->getConnection($alias)->query($sql);
     }
 }

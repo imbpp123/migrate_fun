@@ -18,10 +18,14 @@ class ChunkMaintain
     public function run(ETLInterface  $etl)
     {
         $chunkSize = $etl->getChunkSize();
-        $chunkCount = ceil($etl->getMaxId() / $etl->getChunkSize()) * $chunkSize;
+        $chunkCount = ceil($etl->getMaxId() / $chunkSize);
         $etlName = get_class($etl);
 
-        $this->chunkService->removeChunksIfSizeIsNotEqual($etlName, $chunkSize);
+        $affected = $this->chunkService->removeChunksIfSizeIsNotEqual($etlName, $chunkSize);
+
+        echo "Chunks deleted: " . $affected . PHP_EOL;
+        echo "Chunk size: " . $chunkSize . PHP_EOL;
+        echo "Chunk count: " . $chunkCount . PHP_EOL;
 
         for ($i = 0; $i < $chunkCount; $i++) {
             $chunk = new ChunkEntity();
