@@ -8,5 +8,6 @@ interface ETLInterface
 {
     public function getChunkSize(): int;
     public function getMaxId(): int;
-    public function getChunkToUpdate(): ChunkEntity;
+    public function getChunkToCheck(string $etl): ChunkEntity;
+    public function isChunkHashOutdated(ChunkEntity $chunk): bool;
 }

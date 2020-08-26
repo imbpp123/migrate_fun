@@ -18,14 +18,19 @@ class ChunkChecker
 
     public function run(ETLInterface $etl): void
     {
-        $chunk = $etl->getChunkToUpdate();
+        $etlName = get_class($etl);
 
-        if ($chunk->isEmpty()) {
-            $this->chunkService->createChunk($chunk);
+        // get chunk to update
+        $chunk = $etl->getChunkToCheck($etlName);
+
+        // check chunk hash
+        if (!$etl->isChunkHashOutdated($chunk)) {
             return;
         }
 
+        $chunk->status = 1;
 
+        $this->chunkService->save($chunk);
     }
 
     public function setDbFactory(DbFactory $dbFactory): void
